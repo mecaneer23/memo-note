@@ -12,6 +12,5 @@ This is a simple note taking application
 | [list, l, ls]   | list all notes by title | l                                     |
 | [rawlist, rl]   | list all notes          | rl                                    |
 | [show, s]       | show a specific note    | s MyMemo                              |
-| [file, f]       | add note to a text file | f MyMemo                              |
 | [clear, c, cls] | clear screen            | c                                     |
 | [exit, e]       | exit program            | e                                     |
