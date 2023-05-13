@@ -13,4 +13,4 @@ This is a simple note taking application
 | [rawlist, rl]   | list all notes          | rl                                    |
 | [show, s]       | show a specific note    | s MyMemo                              |
 | [clear, c, cls] | clear screen            | c                                     |
-| [exit, e]       | exit program            | e                                     |
+| [exit, e, q]    | exit program            | e                                     |
