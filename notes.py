@@ -6,21 +6,40 @@ import json
 import os
 
 
-def md_table_to_lines(filename, first_line_idx, last_line_idx, remove=[]):
+def md_table_to_lines(
+    first_line_idx: int,
+    last_line_idx: int,
+    filename: str = "README.md",
+    remove: list[str] = [],
+    column_count: int = 2,
+):
+    # get raw lines
     with open(str(filename)) as f:
         lines = f.readlines()[first_line_idx - 1 : last_line_idx - 1]
+
+    # remove unwanted characters
     for i, _ in enumerate(lines):
         for item in remove:
             lines[i] = lines[i].replace(item, "")
         lines[i] = lines[i].split("|")[1:-1]
-    lines[1] = ("-", "-")
-    key_max = len(max([k.strip() for k, _ in lines], key=len))
-    value_max = len(max([v.strip() for _, v in lines], key=len))
-    lines[1] = ("-" * (key_max + 2), "-" * value_max)
-    for i, (k, v) in enumerate(lines):
-        lines[i] = (k.strip() + " " * (key_max - len(k.strip()) + 2) + v.strip()).ljust(
-            key_max + value_max + 2
-        )
+    # lines[1] = ["-" for _ in range(column_count)]
+
+    # make lists of columns
+    columns = [[0, []] for _ in range(column_count)]
+    for i in range(column_count):
+        for line in lines:
+            columns[i][1].append(line[i])
+
+    # find max length of each column
+    for i, (_, v) in enumerate(columns):
+        columns[i][0] = len(max([w.strip() for w in v], key=len))
+    lines[1] = ["-" * (l + 1) for l, _ in columns]
+
+    # join lines together
+    for i, line in enumerate(lines):
+        for j, v in enumerate(line):
+            line[j] = v.lstrip() + v[-1]
+        lines[i] = "".join(lines[i])
     return lines
 
 
@@ -69,30 +88,27 @@ def show_note(notes, title):
     print(notes[title])
 
 
-def run(single_instance=False):
+def run(args):
     notes = load_notes()
-    input_args = sys.argv[1:] if single_instance else input(">>> ").lower().split(" ")
-    command = input_args[0]
+    command = args[0]
     if command in ("help", "h"):
-        print(
-            md_table_to_lines("README.md", 7, 17)
-        )  # TODO: make sure these are the right numbers
+        print("\n".join(md_table_to_lines(7, 17, column_count=3)))
     elif command in ("add", "a"):
-        notes = add_note(notes, input_args[1:])
+        notes = add_note(notes, args[1:])
     elif command in ("remove", "r"):
-        if len(input_args) < 2:
+        if len(args) < 2:
             print("Make sure to include a note to remove")
-        notes = remove_note(notes, input_args[1])
+        notes = remove_note(notes, args[1])
     elif command in ("list", "l", "ls"):
         list_notes(notes)
     elif command in ("rawlist", "rl"):
         print(notes)
     elif command in ("show", "s"):
-        if len(input_args) < 2:
+        if len(args) < 2:
             print("Make sure to include a note to show")
             return
-        show_note(notes, input_args[1])
-    elif command in ("exit", "e"):
+        show_note(notes, args[1])
+    elif command in ("exit", "e", "q"):
         exit()
     elif command in ("clear", "c", "cls"):
         os.system("cls" if os.name == "nt" else "clear")
@@ -101,11 +117,11 @@ def run(single_instance=False):
 
 
 def main():
-    if len(sys.argv) > 1:
+    if len(sys.argv) <= 1:
         while True:
-            run()
+            run(input(">>> ").lower().split(" "))
     else:
-        run(True)
+        run(sys.argv[1:])
 
 
 if __name__ == "__main__":
