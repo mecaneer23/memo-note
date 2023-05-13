@@ -22,7 +22,6 @@ def md_table_to_lines(
         for item in remove:
             lines[i] = lines[i].replace(item, "")
         lines[i] = lines[i].split("|")[1:-1]
-    # lines[1] = ["-" for _ in range(column_count)]
 
     # make lists of columns
     columns = [[0, []] for _ in range(column_count)]
